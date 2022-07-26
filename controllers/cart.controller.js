@@ -9,6 +9,7 @@ const { AppError } = require('../utils/appError.util');
 const { ProductInCart } = require('../models/productInCart.model');
 const { Product } = require('../models/product.model');
 const { Order } = require('../models/order.model');
+const { Email } = require('../utils/email.util');
 
 dotenv.config({ path: './config.env' });
 
@@ -21,7 +22,7 @@ const addProductToCart = catchAsync(async (req, res, next) => {
   }
 
   const productInCart = await ProductInCart.findOne({
-    where: { productId: product.id },
+    where: { productId: product.id, cartId: cart.id },
   });
 
   if (productInCart) {
@@ -86,7 +87,7 @@ const removeProductCart = catchAsync(async (req, res, next) => {
 });
 
 const makePurchaseProductInCart = catchAsync(async (req, res, next) => {
-  const { cartUser } = req;
+  const { cartUser, sessionUser } = req;
   const listPurchasedProduct = [];
   const priceListPurchasedProducts = [];
   let totalPriceCart = 0;
@@ -123,12 +124,17 @@ const makePurchaseProductInCart = catchAsync(async (req, res, next) => {
 
   await cartUser.update({ status: 'purchased' });
 
-
   const order = await Order.create({
     userId: cartUser.userId,
     cartId: cartUser.id,
     totalPrice: totalPriceCart,
   });
+
+  await new Email(sessionUser.email).sendProductsList(
+    listPurchasedProduct,
+    priceListPurchasedProducts
+  );
+ 
 
   res.status(200).json({
     status: 'success',

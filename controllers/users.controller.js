@@ -8,6 +8,7 @@ const { Product } = require('../models/product.model');
 
 const { catchAsync } = require('../utils/catchAsync.util');
 const { AppError } = require('../utils/appError.util');
+const { Email } = require('../utils/email.util');
 
 dotenv.config({ path: './config.env' });
 
@@ -27,6 +28,8 @@ const createUser = catchAsync(async (req, res, next) => {
 
   // Remove password from response
   newUser.password = undefined;
+
+ await new Email(newUser.email).sendWelcome(newUser.userName);
 
   res.status(201).json({
     status: 'success',

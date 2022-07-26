@@ -1,0 +1,8 @@
+extends base
+
+block emailContent
+    p Product List
+    div(class='products-list_card')
+    h3(class='products-list_title') Product List
+    p(class='products-list_content') #{listPurchasedProduct}
+    p #{priceListPurchasedProducts}
