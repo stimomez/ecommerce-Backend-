@@ -1,5 +1,5 @@
 const { Product } = require('../models/product.model');
-const { ProductInCart } = require('../models/productInCart.model');
+const { ProductImg } = require('../models/productImg.model');
 
 const { AppError } = require('../utils/appError.util');
 const { catchAsync } = require('../utils/catchAsync.util');
@@ -10,8 +10,11 @@ const productExists = catchAsync(async (req, res, next) => {
 
   productId ? (id = productId) : (id = req.params.id);
 
-  const product = await Product.findOne({ where: { id, status: 'active' } });
- 
+  const product = await Product.findOne({
+    where: { id, status: 'active' },
+    include: { model: ProductImg },
+  });
+
   if (!product) {
     return next(new AppError('Product not found', 404));
   }

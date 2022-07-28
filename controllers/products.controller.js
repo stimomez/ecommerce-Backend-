@@ -1,18 +1,36 @@
-const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
 const dotenv = require('dotenv');
+
+const { ref, uploadBytes, getDownloadURL } = require('firebase/storage');
+
+const { storage } = require('../utils/firebase.util');
 
 const { Product } = require('../models/product.model');
 
 const { catchAsync } = require('../utils/catchAsync.util');
-const { AppError } = require('../utils/appError.util');
 const { Category } = require('../models/category.model');
+const { ProductImg } = require('../models/productImg.model');
 
 dotenv.config({ path: './config.env' });
 
 const getAllProducts = catchAsync(async (req, res, next) => {
-  const products = await Product.findAll({ where: { status: 'active' } });
+  const products = await Product.findAll({
+    where: { status: 'active' },
+    include: { model: ProductImg, attributes: ['id', 'imgUrl'] },
+  });
+  await Promise.all(
+    products.map(async product => {
 
+      await Promise.all(
+        product.productImgs.map(async productImg => {
+          const imgRef = ref(storage, productImg.imgUrl);
+
+          const imgFullPath = await getDownloadURL(imgRef);
+
+          productImg.imgUrl = imgFullPath;
+        })
+      );
+    })
+  );
   res.status(200).json({
     status: 'success',
     products,
@@ -22,12 +40,21 @@ const getAllProducts = catchAsync(async (req, res, next) => {
 const getProducById = catchAsync(async (req, res, next) => {
   const { product } = req;
 
+  const productImgsPromises = product.productImgs.map(async productImg => {
+    const imgRef = ref(storage, productImg.imgUrl);
+
+    const imgFullPath = await getDownloadURL(imgRef);
+
+    productImg.imgUrl = imgFullPath;
+  });
+
+  await Promise.all(productImgsPromises);
+
   res.status(200).json({
     status: 'success',
     product,
   });
 });
-
 
 const getAllCategories = catchAsync(async (req, res, next) => {
   const categories = await Category.findAll({ where: { status: 'active' } });
@@ -42,6 +69,8 @@ const createProduct = catchAsync(async (req, res, next) => {
   const { title, description, price, categoryId, quantity } = req.body;
   const { sessionUser } = req;
 
+  
+
   const newProduct = await Product.create({
     title,
     description,
@@ -50,6 +79,24 @@ const createProduct = catchAsync(async (req, res, next) => {
     quantity,
     userId: sessionUser.id,
   });
+
+  if (req.files.length > 0) {
+    const filesPromises = req.files.map(async file => {
+      const imgRef = ref(
+        storage,
+        `products/${Date.now()}_${file.originalname}`
+      );
+
+      const imgRes = await uploadBytes(imgRef, file.buffer);
+
+      await ProductImg.create({
+        productId: newProduct.id,
+        imgUrl: imgRes.metadata.fullPath,
+      });
+    });
+
+    await Promise.all(filesPromises);
+  }
 
   res.status(201).json({
     status: 'success',

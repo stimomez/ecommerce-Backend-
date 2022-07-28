@@ -41,8 +41,11 @@ class Email {
     await this.send('welcome', 'Welcome to our app', { userName });
   }
 
-  async sendProductsList(listPurchasedProduct, priceListPurchasedProducts) {
-    await this.send('productsList',{listPurchasedProduct,priceListPurchasedProducts});
+  async sendProductsList(listPurchasedProduct,totalPriceCart) {
+    await this.send('productsList', 'List of purchased products', {
+      listPurchasedProduct,
+      totalPriceCart,
+    });
   }
 }
 

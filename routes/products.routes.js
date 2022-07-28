@@ -2,16 +2,8 @@ const express = require('express');
 
 const { categoryExists } = require('../middlewares/category.middleware');
 
-// Middlewares
-const {
-  createUserValidators,
-} = require('../middlewares/validators.middleware');
-
-const { userExists } = require('../middlewares/users.middleware');
-
 const {
   protectSession,
-  protectUserAccount,
 } = require('../middlewares/auth.middleware');
 const {
   getAllProducts,
@@ -27,6 +19,8 @@ const {
   productExists,
   protectProductAuthor,
 } = require('../middlewares/product.middleware');
+
+const { upload } = require('../utils/upload.util');
 const {
   createProductValidators,
 } = require('../middlewares/validators.middlewares');
@@ -39,7 +33,14 @@ productsRouter.get('/:id', productExists, getProducById);
 
 productsRouter.use(protectSession);
 
-productsRouter.post('/', createProductValidators,categoryExists, createProduct);
+productsRouter.post(
+  '/',
+  upload.array('productsImg', 5),
+  createProductValidators,
+  categoryExists,
+
+  createProduct
+);
 
 productsRouter
   .route('/:id')

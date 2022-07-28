@@ -38,9 +38,10 @@ const cartActivated = catchAsync(async (req, res, next) => {
 
 const productInCart = catchAsync(async (req, res, next) => {
   const { productId } = req.params;
+  const { cartUser } = req;
 
   const productInCart = await ProductInCart.findOne({
-    where: { productId, status: 'active' },
+    where: { productId, cartId: cartUser.id, status: 'active' },
   });
 
   if (!productInCart) {

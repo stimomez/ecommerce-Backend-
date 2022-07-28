@@ -1,8 +1,26 @@
 extends base
 
 block emailContent
-    p Product List
-    div(class='products-list_card')
-    h3(class='products-list_title') Product List
-    p(class='products-list_content') #{listPurchasedProduct}
-    p #{priceListPurchasedProducts}
+
+    h2(class="title-products-list") Products List
+    table(class="table-products-list") 
+        tr(class="tr-products-list") 
+            th(class="th-products-list")  Product Name
+            th(class="th-products-list") Unit Value
+            th(class="th-products-list") Purchased Amount
+            th(class="th-products-list") Total
+        each product in  listPurchasedProduct
+            tr(class="tr-products-list") 
+                td(class="td-products-list") #{product.product.title}
+                td(class="td-products-list") #{product.product.price} 
+                td(class="td-products-list") #{product.productInCart.quantity}
+                td(class="td-products-list") #{product.totalProductCart}
+        tr(class="tr-products-list") 
+            td
+            td(class="td-products-total")  total bill
+            td 
+            td(class="td-products-total") #{totalPriceCart}
+
+
+
+

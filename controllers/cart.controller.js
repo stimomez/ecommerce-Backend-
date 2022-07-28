@@ -1,8 +1,4 @@
-const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
 const dotenv = require('dotenv');
-
-const { User } = require('../models/user.model');
 
 const { catchAsync } = require('../utils/catchAsync.util');
 const { AppError } = require('../utils/appError.util');
@@ -89,7 +85,6 @@ const removeProductCart = catchAsync(async (req, res, next) => {
 const makePurchaseProductInCart = catchAsync(async (req, res, next) => {
   const { cartUser, sessionUser } = req;
   const listPurchasedProduct = [];
-  const priceListPurchasedProducts = [];
   let totalPriceCart = 0;
 
   const productsInCart = await ProductInCart.findAll({
@@ -102,10 +97,6 @@ const makePurchaseProductInCart = catchAsync(async (req, res, next) => {
         where: { id: productInCart.productId, status: 'active' },
       });
 
-      listPurchasedProduct.push(product);
-
-      priceListPurchasedProducts.push(productInCart.quantity);
-
       const subtraction = product.quantity - productInCart.quantity;
 
       await product.update({ quantity: subtraction });
@@ -116,11 +107,17 @@ const makePurchaseProductInCart = catchAsync(async (req, res, next) => {
 
       const totalProductCart = product.price * productInCart.quantity;
 
+      listPurchasedProduct.push({ product, productInCart, totalProductCart });
+
       totalPriceCart = totalPriceCart + totalProductCart;
 
       await productInCart.update({ status: 'purchased' });
     })
   );
+
+  if (totalPriceCart < 1) {
+    return next(new AppError('Invalid quantity', 400));
+  }
 
   await cartUser.update({ status: 'purchased' });
 
@@ -132,9 +129,8 @@ const makePurchaseProductInCart = catchAsync(async (req, res, next) => {
 
   await new Email(sessionUser.email).sendProductsList(
     listPurchasedProduct,
-    priceListPurchasedProducts
+    totalPriceCart
   );
- 
 
   res.status(200).json({
     status: 'success',

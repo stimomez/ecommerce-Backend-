@@ -15,6 +15,17 @@ const checkResult = (req, res, next) => {
   next();
 };
 
+const createUserValidators = [
+  body('userName').notEmpty().withMessage('Name cannot be empty'),
+  body('email').isEmail().withMessage('Must provide a valid email'),
+  body('password')
+    .isLength({ min: 8 })
+    .withMessage('Password must be at least 8 characters long')
+    .isAlphanumeric()
+    .withMessage('Password must contain letters and numbers'),
+  checkResult,
+];
+
 const createProductValidators = [
   body('title').notEmpty().withMessage('Title cannot be empty'),
   body('description').notEmpty().withMessage('Description cannot be empty'),
@@ -36,4 +47,23 @@ const createProductValidators = [
   checkResult,
 ];
 
-module.exports = { createProductValidators };
+const validatorsAddProductToCart = [
+  body('productId')
+    .notEmpty()
+    .withMessage('productId cannot be empty')
+    .isNumeric()
+    .withMessage('productId is numeric value'),
+  body('quantity')
+    .notEmpty()
+    .withMessage('Quantity cannot be empty')
+    .isNumeric()
+    .withMessage('Quantity is numeric value')
+    .custom(val => val > 0).withMessage('Must provide values above 0'),
+     checkResult,
+];
+
+module.exports = {
+  createProductValidators,
+  createUserValidators,
+  validatorsAddProductToCart,
+};

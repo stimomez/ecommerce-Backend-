@@ -12,10 +12,7 @@ const {
  
 } = require('../controllers/users.controller');
 
-// Middlewares
-const {
-  createUserValidators,
-} = require('../middlewares/validators.middleware');
+
 
 const { userExists } = require('../middlewares/users.middleware');
 
@@ -24,6 +21,7 @@ const {
   protectUserAccount,
 } = require('../middlewares/auth.middleware');
 const { orderExists } = require('../middlewares/order.middleware');
+const { createUserValidators } = require('../middlewares/validators.middlewares');
 
 
 const usersRouter = express.Router();

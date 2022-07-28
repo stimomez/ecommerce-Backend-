@@ -7,6 +7,7 @@ const { catchAsync } = require('../utils/catchAsync.util');
 
 const categoryExists = catchAsync(async (req, res, next) => {
   const { categoryId } = req.body;
+  console.log(req);
   let id;
 
   categoryId ? (id = categoryId) : (id = req.params.id);
