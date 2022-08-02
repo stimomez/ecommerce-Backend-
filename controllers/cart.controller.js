@@ -6,7 +6,7 @@ const { ProductInCart } = require('../models/productInCart.model');
 const { Product } = require('../models/product.model');
 const { Order } = require('../models/order.model');
 const { Email } = require('../utils/email.util');
-const { Cart } = require('../models/cart.model');
+const { ProductImg } = require('../models/productImg.model');
 
 dotenv.config({ path: './config.env' });
 
@@ -14,6 +14,7 @@ const getAllCart = catchAsync(async (req, res, next) => {
   const { cartUser } = req;
   const productInCart = await ProductInCart.findAll({
     where: { cartId: cartUser.id },
+    include: { model: Product, include:{model:ProductImg} },
   });
   res.status(200).json({
     productInCart,
@@ -169,5 +170,5 @@ module.exports = {
   updateProductCart,
   removeProductCart,
   makePurchaseProductInCart,
-  getAllCart
+  getAllCart,
 };
