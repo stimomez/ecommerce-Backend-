@@ -29,7 +29,7 @@ const {
 const productsRouter = express.Router();
 
 productsRouter.get('/categories', getAllCategories);
-productsRouter.get('/categories/:id',categoryExists, getCategoryById);
+productsRouter.get('/category/:id',categoryExists, getCategoryById);
 productsRouter.get('/', getAllProducts);
 productsRouter.get('/:id', productExists, getProducById);
 
@@ -51,6 +51,6 @@ productsRouter
 
 productsRouter.post('/categories', createCategory);
 
-productsRouter.patch('/categories/:id', categoryExists, updateCategory);
+productsRouter.patch('/category/:id', categoryExists, updateCategory);
 
 module.exports = { productsRouter };
