@@ -6,22 +6,31 @@ const {
   updateProductCart,
   removeProductCart,
   makePurchaseProductInCart,
+  getAllCart,
 } = require('../controllers/cart.controller');
 const {
   cartActivated,
   cartExists,
   productInCart,
 } = require('../middlewares/cart.middleware');
+const { productExists } = require('../middlewares/product.middleware');
 const {
-  productExists,
-} = require('../middlewares/product.middleware');
-const { validatorsAddProductToCart } = require('../middlewares/validators.middlewares');
+  validatorsAddProductToCart,
+} = require('../middlewares/validators.middlewares');
 
 const cartRouter = express.Router();
 
 cartRouter.use(protectSession);
 
-cartRouter.post('/add-product',validatorsAddProductToCart, productExists, cartActivated, addProductToCart);
+cartRouter.get('/products-cart', cartExists, getAllCart);
+
+cartRouter.post(
+  '/add-product',
+  validatorsAddProductToCart,
+  productExists,
+  cartActivated,
+  addProductToCart
+);
 
 cartRouter.patch('/update-cart', productExists, cartExists, updateProductCart);
 
