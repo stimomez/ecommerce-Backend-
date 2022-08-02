@@ -23,14 +23,28 @@ const addProductToCart = catchAsync(async (req, res, next) => {
 
   if (productInCart) {
     if (productInCart.status === 'active') {
-      return next(new AppError('This product has already been added', 404));
+      // return next(new AppError('This product has already been added', 404));
+      const updateQuantity = productInCart.quantity + quantity;
+
+      if (updateQuantity > product.quantity) {
+        return next(new AppError('Quantity not available of the product', 400));
+      }
+
+      const newProductIncart = await productInCart.update({
+        quantity: updateQuantity,
+      });
+
+      return res.status(201).json({
+        status: 'success',
+        newProductIncart,
+      });
     } else {
       const newProductIncart = await productInCart.update({
         status: 'active',
         quantity,
       });
 
-      res.status(201).json({
+      return res.status(201).json({
         status: 'success',
         newProductIncart,
       });

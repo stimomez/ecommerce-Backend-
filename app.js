@@ -1,4 +1,5 @@
 const express = require('express');
+const cors = require('cors');
 const rateLimit = require('express-rate-limit');
 const compression = require('compression');
 const morgan = require('morgan');
@@ -15,6 +16,9 @@ const { cartRouter } = require('./routes/cart.routes');
 const { viewsRouter } = require('./routes/views.routes');
 
 const app = express();
+
+// Enable CORS
+app.use(cors());
 
 app.use(express.json());
 

@@ -14,7 +14,6 @@ dotenv.config({ path: './config.env' });
 
 const getAllProducts = catchAsync(async (req, res, next) => {
   const products = await Product.findAll({
-    where: { status: 'active' },
     include: { model: ProductImg, attributes: ['id', 'imgUrl'] },
   });
   await Promise.all(

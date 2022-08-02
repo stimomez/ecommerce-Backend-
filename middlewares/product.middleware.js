@@ -7,13 +7,22 @@ const { catchAsync } = require('../utils/catchAsync.util');
 const productExists = catchAsync(async (req, res, next) => {
   const { productId } = req.body;
   let id;
+  let s = true;
+  let product = false;
 
-  productId ? (id = productId) : (id = req.params.id);
+  productId ? (id = productId) : ((id = req.params.id), (s = true));
 
-  const product = await Product.findOne({
-    where: { id, status: 'active' },
-    include: { model: ProductImg },
-  });
+  if (s) {
+    product = await Product.findOne({
+      where: { id },
+      include: { model: ProductImg },
+    });
+  } else {
+    product = await Product.findOne({
+      where: { id, status: 'active' },
+      include: { model: ProductImg },
+    });
+  }
 
   if (!product) {
     return next(new AppError('Product not found', 404));
