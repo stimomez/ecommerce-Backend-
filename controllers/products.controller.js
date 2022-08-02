@@ -18,7 +18,6 @@ const getAllProducts = catchAsync(async (req, res, next) => {
   });
   await Promise.all(
     products.map(async product => {
-
       await Promise.all(
         product.productImgs.map(async productImg => {
           const imgRef = ref(storage, productImg.imgUrl);
@@ -64,11 +63,17 @@ const getAllCategories = catchAsync(async (req, res, next) => {
   });
 });
 
+const getCategoryById = catchAsync((req, res, next) => {
+  const { category } = req;
+  res.status(200).json({
+    status: 'success',
+    category,
+  });
+});
+
 const createProduct = catchAsync(async (req, res, next) => {
   const { title, description, price, categoryId, quantity } = req.body;
   const { sessionUser } = req;
-
-  
 
   const newProduct = await Product.create({
     title,
@@ -156,4 +161,5 @@ module.exports = {
   disableProduct,
   createCategory,
   updateCategory,
+  getCategoryById,
 };

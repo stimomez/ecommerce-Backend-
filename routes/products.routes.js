@@ -14,6 +14,7 @@ const {
   disableProduct,
   createCategory,
   updateCategory,
+  getCategoryById,
 } = require('../controllers/products.controller');
 const {
   productExists,
@@ -28,6 +29,7 @@ const {
 const productsRouter = express.Router();
 
 productsRouter.get('/categories', getAllCategories);
+productsRouter.get('/categories/:id',categoryExists, getCategoryById);
 productsRouter.get('/', getAllProducts);
 productsRouter.get('/:id', productExists, getProducById);
 
