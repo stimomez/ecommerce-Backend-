@@ -15,7 +15,7 @@ dotenv.config({ path: './config.env' });
 const getAllCart = catchAsync(async (req, res, next) => {
   const { cartUser } = req;
   const productsInCart = await ProductInCart.findAll({
-    where: { cartId: cartUser.id },
+    where: { cartId: cartUser.id, status: 'active' },
     include: {
       model: Product,
       include: { model: ProductImg, attributes: ['id', 'imgUrl'] },
