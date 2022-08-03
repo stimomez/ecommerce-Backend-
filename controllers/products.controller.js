@@ -63,8 +63,9 @@ const getAllCategories = catchAsync(async (req, res, next) => {
   });
 });
 
-const getCategoryById = catchAsync((req, res, next) => {
+const getCategoryById = catchAsync(async (req, res, next) => {
   const { category } = req;
+
   res.status(200).json({
     status: 'success',
     category,

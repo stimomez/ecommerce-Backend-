@@ -25,6 +25,9 @@ const initModels = () => {
   Product.hasOne(ProductInCart);
   ProductInCart.belongsTo(Product);
 
+  Category.hasMany(Product);
+  Product.belongsTo(Category);
+
   Category.hasOne(ProductInCart);
   ProductInCart.belongsTo(Category);
 
