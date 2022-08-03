@@ -9,6 +9,7 @@ const { Product } = require('../models/product.model');
 const { catchAsync } = require('../utils/catchAsync.util');
 const { Category } = require('../models/category.model');
 const { ProductImg } = require('../models/productImg.model');
+const { Op } = require('sequelize');
 
 dotenv.config({ path: './config.env' });
 
@@ -60,6 +61,37 @@ const getAllCategories = catchAsync(async (req, res, next) => {
   res.status(200).json({
     status: 'success',
     categories,
+  });
+});
+
+const filterSearchProducts = catchAsync(async (req, res, next) => {
+  const { search } = req.params;
+  console.log(search);
+  const products = await Product.findAll({
+    where: {
+      status: 'active',
+      [Op.or]: [{ title: search }, { description: search }],
+    },
+    include: { model: ProductImg, attributes: ['id', 'imgUrl'] },
+  });
+
+  await Promise.all(
+    products.map(async product => {
+      await Promise.all(
+        product.productImgs.map(async productImg => {
+          const imgRef = ref(storage, productImg.imgUrl);
+
+          const imgFullPath = await getDownloadURL(imgRef);
+
+          productImg.imgUrl = imgFullPath;
+        })
+      );
+    })
+  );
+
+  res.status(200).json({
+    status: 'success',
+    products,
   });
 });
 
@@ -179,4 +211,5 @@ module.exports = {
   createCategory,
   updateCategory,
   getCategoryById,
+  filterSearchProducts,
 };

@@ -15,6 +15,7 @@ const {
   createCategory,
   updateCategory,
   getCategoryById,
+  filterSearchProducts,
 } = require('../controllers/products.controller');
 const {
   productExists,
@@ -31,6 +32,7 @@ const productsRouter = express.Router();
 productsRouter.get('/categories', getAllCategories);
 productsRouter.get('/category/:id',categoryExists, getCategoryById);
 productsRouter.get('/', getAllProducts);
+productsRouter.get('/filter/:search', filterSearchProducts);
 productsRouter.get('/:id', productExists, getProducById);
 
 productsRouter.use(protectSession);
