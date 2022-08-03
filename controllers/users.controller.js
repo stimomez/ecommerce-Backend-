@@ -9,6 +9,8 @@ const { Product } = require('../models/product.model');
 const { catchAsync } = require('../utils/catchAsync.util');
 const { AppError } = require('../utils/appError.util');
 const { Email } = require('../utils/email.util');
+const { Cart } = require('../models/cart.model');
+const { ProductInCart } = require('../models/productInCart.model');
 
 dotenv.config({ path: './config.env' });
 
@@ -29,7 +31,7 @@ const createUser = catchAsync(async (req, res, next) => {
   // Remove password from response
   newUser.password = undefined;
 
- await new Email(newUser.email).sendWelcome(newUser.userName);
+  await new Email(newUser.email).sendWelcome(newUser.userName);
 
   res.status(201).json({
     status: 'success',
@@ -93,6 +95,22 @@ const getAllOrdersUser = catchAsync(async (req, res, next) => {
 
   const orders = await Order.findAll({
     where: { userId: id },
+    include: {
+      model: User,
+      attributes: ['id','userName'],
+      include: {
+        model: Cart,
+        attributes: ['id','status'],
+        where: { status: 'purchased' },
+        include: {
+          model: ProductInCart,
+          attributes: ['id', 'quantity'],
+          where: { status: 'purchased' },
+          include: { model: Product, attributes:['id','categoryId','title'] },
+        },
+       
+      },
+    },
   });
 
   res.status(200).json({
