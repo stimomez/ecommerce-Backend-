@@ -1,6 +1,7 @@
 // Models
 const { Category } = require('../models/category.model');
 const { Product } = require('../models/product.model');
+const { ProductImg } = require('../models/productImg.model');
 
 // Utils
 const { AppError } = require('../utils/appError.util');
@@ -15,7 +16,12 @@ const categoryExists = catchAsync(async (req, res, next) => {
 
   const category = await Category.findOne({
     where: { id },
-    include: { model: Product, required: false, where: { status: 'active' } },
+    include: {
+      model: Product,
+      required: false,
+      where: { status: 'active' },
+      include: { model: ProductImg ,required: false, attributes:['imgUrl'] },
+    },
   });
 
   if (!category) {
