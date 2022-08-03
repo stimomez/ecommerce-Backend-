@@ -66,6 +66,22 @@ const getAllCategories = catchAsync(async (req, res, next) => {
 const getCategoryById = catchAsync(async (req, res, next) => {
   const { category } = req;
 
+  if (category.products.length > 0) {
+    await Promise.all(
+      category.products.map(async product => {
+        await Promise.all(
+          product.productImgs.map(async productImg => {
+            const imgRef = ref(storage, productImg.imgUrl);
+
+            const imgFullPath = await getDownloadURL(imgRef);
+
+            productImg.imgUrl = imgFullPath;
+          })
+        );
+      })
+    );
+  }
+
   res.status(200).json({
     status: 'success',
     category,
