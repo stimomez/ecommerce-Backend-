@@ -28,8 +28,6 @@ const initModels = () => {
   Category.hasMany(Product);
   Product.belongsTo(Category);
 
-  Category.hasOne(ProductInCart);
-  ProductInCart.belongsTo(Category);
 
   Product.hasMany(ProductImg);
   ProductImg.belongsTo(Product);

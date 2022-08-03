@@ -7,17 +7,36 @@ const { Product } = require('../models/product.model');
 const { Order } = require('../models/order.model');
 const { Email } = require('../utils/email.util');
 const { ProductImg } = require('../models/productImg.model');
+const { getDownloadURL, ref } = require('firebase/storage');
+const { storage } = require('../utils/firebase.util');
 
 dotenv.config({ path: './config.env' });
 
 const getAllCart = catchAsync(async (req, res, next) => {
   const { cartUser } = req;
-  const productInCart = await ProductInCart.findAll({
+  const productsInCart = await ProductInCart.findAll({
     where: { cartId: cartUser.id },
-    include: { model: Product, include:{model:ProductImg} },
+    include: {
+      model: Product,
+      include: { model: ProductImg, attributes: ['id', 'imgUrl'] },
+    },
   });
+
+  await Promise.all(
+    productsInCart.map(async productIncart => {
+      await Promise.all(
+        productIncart.product.productImgs.map(async productImg => {
+          const imgRef = ref(storage, productImg.imgUrl);
+
+          const imgFullPath = await getDownloadURL(imgRef);
+
+          productImg.imgUrl = imgFullPath;
+        })
+      );
+    })
+  );
   res.status(200).json({
-    productInCart,
+    productsInCart,
     status: 'success',
   });
 });
