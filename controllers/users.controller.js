@@ -11,6 +11,7 @@ const { AppError } = require('../utils/appError.util');
 const { Email } = require('../utils/email.util');
 const { Cart } = require('../models/cart.model');
 const { ProductInCart } = require('../models/productInCart.model');
+const { async } = require('@firebase/util');
 
 dotenv.config({ path: './config.env' });
 
@@ -92,44 +93,41 @@ const login = catchAsync(async (req, res, next) => {
 const getAllOrdersUser = catchAsync(async (req, res, next) => {
   const { sessionUser } = req;
   const { id } = sessionUser;
+  const orderWithYourProducts = [];
 
   const orders = await Order.findAll({
     where: { userId: id },
-    include: {
-      model: User,
-      attributes: ['id','userName'],
-      include: {
-        model: Cart,
-        attributes: ['id','status'],
-        where: { status: 'purchased' },
-        include: {
-          model: ProductInCart,
-          attributes: ['id', 'quantity'],
-          where: { status: 'purchased' },
-          include: { model: Product, attributes:['id','categoryId','title','price'] },
-        },
-       
-      },
-    },
   });
+
+  for (let i = 0; i < orders.length; i++) {
+    const cartId = orders[i].cartId;
+    const productInCart = await ProductInCart.findOne({
+      where: { cartId, status: 'purchased' },
+      include: { model: Product },
+    });
+    if (productInCart) {
+      orderWithYourProducts.push({ order: orders[i], productInCart: productInCart });
+    }
+  }
 
   res.status(200).json({
     status: 'success',
-    orders,
+    orderWithYourProducts,
   });
 });
 
 const getOrderById = catchAsync(async (req, res, next) => {
-  const { order, sessionUser } = req;
-  // const { id } = sessionUser;
-
-  // if (order.userId !== id) {
-  //   return next(new AppError('User without orders', 403));
-  // }
+  const { order } = req;
+  const orderWithYourProducts = [];
+  const productInCart = await ProductInCart.findOne({
+    where: { cartId: order.cartId, status: 'purchased' },
+    include: { model: Product },
+  });
+  orderWithYourProducts.push({ order: order, productInCart: productInCart });
 
   res.status(200).json({
     status: 'success',
-    order,
+    orderWithYourProducts,
   });
 });
 

@@ -13,24 +13,6 @@ const orderExists = catchAsync(async (req, res, next) => {
 
   const order = await Order.findOne({
     where: { id, userId: sessionUser.id, status },
-    include: {
-      model: User,
-      attributes: ['id', 'userName'],
-      include: {
-        model: Cart,
-        attributes: ['id', 'status'],
-        where: { status: 'purchased' },
-        include: {
-          model: ProductInCart,
-          attributes: ['id', 'quantity'],
-          where: { status: 'purchased' },
-          include: {
-            model: Product,
-            attributes: ['id', 'categoryId', 'title','price'],
-          },
-        },
-      },
-    },
   });
 
   if (!order) {
