@@ -26,7 +26,7 @@ const orderExists = catchAsync(async (req, res, next) => {
           where: { status: 'purchased' },
           include: {
             model: Product,
-            attributes: ['id', 'categoryId', 'title'],
+            attributes: ['id', 'categoryId', 'title','price'],
           },
         },
       },

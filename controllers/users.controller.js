@@ -106,7 +106,7 @@ const getAllOrdersUser = catchAsync(async (req, res, next) => {
           model: ProductInCart,
           attributes: ['id', 'quantity'],
           where: { status: 'purchased' },
-          include: { model: Product, attributes:['id','categoryId','title'] },
+          include: { model: Product, attributes:['id','categoryId','title','price'] },
         },
        
       },
@@ -121,11 +121,11 @@ const getAllOrdersUser = catchAsync(async (req, res, next) => {
 
 const getOrderById = catchAsync(async (req, res, next) => {
   const { order, sessionUser } = req;
-  const { id } = sessionUser;
+  // const { id } = sessionUser;
 
-  if (order.userId !== id) {
-    return next(new AppError('User without orders', 403));
-  }
+  // if (order.userId !== id) {
+  //   return next(new AppError('User without orders', 403));
+  // }
 
   res.status(200).json({
     status: 'success',
