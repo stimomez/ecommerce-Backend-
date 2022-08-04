@@ -101,12 +101,23 @@ const getAllOrdersUser = catchAsync(async (req, res, next) => {
 
   for (let i = 0; i < orders.length; i++) {
     const cartId = orders[i].cartId;
-    const productInCart = await ProductInCart.findOne({
+    const productInCart = await ProductInCart.findAll({
       where: { cartId, status: 'purchased' },
-      include: { model: Product },
+      attributes: ['id', 'cartId', 'quantity', 'status'],
+      include: {
+        model: Product,
+        attributes: { exclude: 'createdAt updatedAt userId categoryId status ' },
+      },
     });
-    if (productInCart) {
-      orderWithYourProducts.push({ order: orders[i], productInCart: productInCart });
+    if (productInCart.length > 0) {
+      // for (let j = 0; j < productInCart.length; j++) {
+
+      orderWithYourProducts.push({
+        order: orders[i],
+        productInCart: productInCart,
+      });
+
+      // }
     }
   }
 
