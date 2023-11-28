@@ -1,10 +1,9 @@
 FROM node:18
 
-WORKDIR /app
+RUN mkdir -p /home/app
 
-COPY package.json .
-RUN npm install
+COPY . /home/app
 
-COPY . .
+EXPOSE  3000
 
-CMD npm start
+CMD ["node","/home/app/src/server.js"]
