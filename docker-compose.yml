@@ -1,0 +1,22 @@
+version: '3.9'
+services:
+  pg3:
+    image: postgres
+    environment:
+      POSTGRES_DB: ecommerce
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: post1221
+    ports:
+      - '5432:5432'
+    volumes:
+      - pg3-data:/var/lib/postgresql/data
+  ecommerce:
+    build: .
+    depends_on:
+      - pg3
+    ports:
+      - '3520:3520'
+    links:
+      - pg3
+volumes:
+  pg3-data:

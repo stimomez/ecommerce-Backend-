@@ -2,7 +2,6 @@ const { Sequelize, DataTypes } = require('sequelize');
 const dotenv = require('dotenv');
 
 dotenv.config({ path: './config.env' });
-
 const db = new Sequelize({
   dialect: 'postgres',
   host: process.env.DB_HOST,
