@@ -103,10 +103,13 @@ const getAllOrdersUser = catchAsync(async (req, res, next) => {
     const cartId = orders[i].cartId;
     const productInCart = await ProductInCart.findAll({
       where: { cartId, status: 'purchased' },
+      order: [['updatedAt', 'DESC']],
       attributes: ['id', 'cartId', 'quantity', 'status'],
       include: {
         model: Product,
-        attributes: { exclude: 'createdAt updatedAt userId categoryId status ' },
+        attributes: {
+          exclude: 'createdAt updatedAt userId categoryId status ',
+        },
       },
     });
     if (productInCart.length > 0) {
